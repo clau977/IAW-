@@ -13,3 +13,16 @@ set -e
 #   4. Que no se acumulen: borra las copias radio-*.sql de más de 7 días.
 #   5. Que diga qué fichero ha creado.
 
+#!/bin/sh
+set -e
+
+. /srv/servidor/radio.env
+
+FECHA=$(date +%Y%m%d-%H%M%S)
+SALIDA="/copias/radio-$FECHA.sql"
+
+mysqldump -h "$DB_HOST" -u "$COPIAS_USER" -p"$COPIAS_PASS" --single-transaction "$DB_NAME" > "$SALIDA"
+
+find /copias -name 'radio-*.sql' -mtime +7 -delete
+
+echo "Copia creada: $SALIDA"
